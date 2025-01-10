@@ -29,6 +29,10 @@ module decode_stage(
     output [29:0] pc_out,
     output branch_prediction_taken
 );
+    //                                                                                                  //
+    
+    // * Execute stage buffers
+
     reg [31:0] inst_out_buffer;
     reg [12:0] ctr_word_out_buffer;
     reg [29:0] pc_buffer;
@@ -48,17 +52,29 @@ module decode_stage(
     assign inst_out = inst_out_buffer;
     assign ctr_word_out = ctr_word_out_buffer;
 
+    //                                                                                                  //
+
+    // * Instruction decoding
+
     wire [12:0] decoder_ctr_word;
 
     inst_dec_rom instruction_decoder (
         .opcode(inst_in[6:0]), .ctr_word(decoder_ctr_word)
     );
 
+    //                                                                                                  //
+
+    // * Register file
+
     regfile regfile(
         .clk(clk), .clk_en(clk_en), .we(regfile_we),
         .data_in(regfile_data_in), .rs1_addr(inst_in[19:15]), .rs2_addr(inst_in[24:20]), .rd_addr(regfile_destination),
         .rs1(regfile_rs1_out), .rs2(regfile_rs2_out)
     );
+
+    //                                                                                                  //
+
+    // * Branch prediction
 
     wire branch_prediction;
     reg branch_prediction_buffer;
@@ -85,6 +101,8 @@ module decode_stage(
 
     assign pc_jmp = branch_prediction_incorrect || branch_prediction_taken;
     assign pc_target_address = branch_prediction_incorrect ? pc_target_address_in : btb_out;
+
+    //                                                                                                  //
 
 endmodule : decode_stage
 

@@ -30,6 +30,7 @@ module execute_stage(
     output bus_lock,
     output memory_mode //Write = 1
 );
+    //                                                                                                  //
     // * Control lines
     wire ctr_alu_asel = ctr_word_in[0];
     wire ctr_alu_bsel = ctr_word_in[1];
@@ -49,6 +50,8 @@ module execute_stage(
     wire [31:0] inst_b_imm = {{20{inst_in[31]}}, inst_in[7], inst_in[30:25], inst_in[11:8], 1'b0};
     wire [31:0] inst_u_imm = {inst_in[31:12], 12'h0};
     wire [31:0] inst_j_imm = {{12{inst_in[31]}}, inst_in[20], inst_in[19:12], inst_in[30:21], 1'b0};
+
+    //                                                                                                  //
 
     // * Writeback stage buffers
 
@@ -70,7 +73,7 @@ module execute_stage(
     reg [29:0] inc_pc_buffer;
     assign inc_pc_out = inc_pc_buffer;
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk) begin : Buffer
         if(sync_rst) begin
             ctr_buffer <= 0;
         end else if(clk_en) begin
@@ -82,6 +85,8 @@ module execute_stage(
             inc_pc_buffer <= pc_in + 1;
         end
     end
+
+    //                                                                                                  //
 
     // * ALU connections
     logic [31:0] alu_imm;
@@ -108,6 +113,8 @@ module execute_stage(
         .a(alu_a), .b(alu_b), .fn3(alu_mod), .fn7_bit5(alu_fn7_bit5), .result(alu_result)
     );
 
+    //                                                                                                  //
+
     // * Memory connections
     assign address_out = alu_result[31:2];
     assign bus_lock = ctr_bus_lock;
@@ -125,6 +132,8 @@ module execute_stage(
     DATA_OUT = 0x50FF
     MASK = 0011
     */
+
+    //                                                                                                  //
 
     // * Branch handling
     assign branch_feedback_enable = ctr_jump || ctr_branch;
@@ -144,6 +153,8 @@ module execute_stage(
     assign branch_actual_result = branch_result;
     assign pc_target_address = branch_actual_result ? alu_result[31:2] : pc_in;
     assign branch_prediction_incorrect = (ctr_jump || ctr_branch) && (branch_actual_result ^^ branch_prediction_taken);
+
+    //                                                                                                  //
 
 
 endmodule : execute_stage
