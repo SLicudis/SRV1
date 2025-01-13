@@ -7,29 +7,23 @@ module execute_stage(
     input [31:0] regfile_rs1,
     input [31:0] regfile_rs2,
     input [29:0] pc_in,
-    input branch_prediction_taken,
 
-    // * To decode stage
+    // * To fetch stage
     output [29:0] pc_target_address,
-    output branch_feedback_enable,
-    output branch_actual_result,
-    output branch_prediction_incorrect,
+    output pc_jmp,
 
-    // * To writeback stage
-    output [19:0] inst_u_imm_out,
-    output [2:0] inst_fn3_out,
-    output [4:0] rd_addr_out,
-    output [2:0] ctr_out,
+    // * To memory stage
+    output [4:0] ctr_out,
+    output [31:0] inst_out,
     output [31:0] alu_out,
     output [29:0] inc_pc_out,
-
-    // * To memory pins
-    output logic [31:0] data_out,
-    output [29:0] address_out,
-    output [3:0] mask,
-    output bus_lock,
-    output memory_mode //Write = 1
+    output [31:0] regfile_rs2_out,
+    output [4:0] exe_rs1_address, //Current RS1 address
+    output [4:0] exe_rs2_address, //Current RS2 address
+    output exe_uses_rs1, //Currently using RS1?
+    output exe_uses_rs2 //Currently using RS12
 );
+    //                                                                                                  //
     // * Control lines
     wire ctr_alu_asel = ctr_word_in[0];
     wire ctr_alu_bsel = ctr_word_in[1];
@@ -37,8 +31,6 @@ module execute_stage(
     wire [2:0] ctr_imm_sel = ctr_word_in[5:3];
     wire ctr_jump = ctr_word_in[6];
     wire ctr_branch = ctr_word_in[7];
-    wire ctr_bus_lock = ctr_word_in[8];
-    wire ctr_memory_mode = ctr_word_in[9];
 
     // * Instruction parts
     wire [6:0] inst_fn7 = inst_in[31:25];
@@ -50,19 +42,15 @@ module execute_stage(
     wire [31:0] inst_u_imm = {inst_in[31:12], 12'h0};
     wire [31:0] inst_j_imm = {{12{inst_in[31]}}, inst_in[20], inst_in[19:12], inst_in[30:21], 1'b0};
 
-    // * Writeback stage buffers
+    //                                                                                                  //
 
-    reg [2:0] ctr_buffer;
+    // * --- Memory stage buffers & outputs ---
+
+    reg [4:0] ctr_buffer;
     assign ctr_out = ctr_buffer;
 
-    reg [19:0] inst_u_imm_buffer;
-    assign inst_u_imm_out = inst_u_imm_buffer;
-
-    reg [2:0] inst_fn3_buffer;
-    assign inst_fn3_out = inst_fn3_buffer;
-
-    reg [4:0] rd_addr_buffer;
-    assign rd_addr_out = rd_addr_buffer;
+    reg [31:0] inst_buffer;
+    assign inst_out = inst_buffer;
 
     reg [31:0] alu_buffer;
     assign alu_out = alu_buffer;
@@ -70,18 +58,27 @@ module execute_stage(
     reg [29:0] inc_pc_buffer;
     assign inc_pc_out = inc_pc_buffer;
 
-    always_ff @(posedge clk) begin
+    reg [31:0] regfile_rs2_buffer;
+    assign regfile_rs2_out = regfile_rs2_buffer;
+
+    always_ff @(posedge clk) begin : Buffer
         if(sync_rst) begin
             ctr_buffer <= 0;
         end else if(clk_en) begin
-            ctr_buffer <= ctr_word_in[12:10];
-            inst_u_imm_buffer <= inst_u_imm[19:0];
-            inst_fn3_buffer <= inst_fn3;
-            rd_addr_buffer <= inst_in[11:7];
+            ctr_buffer <= ctr_word_in[12:8];
+            inst_buffer <= inst_in;
             alu_buffer <= alu_result;
             inc_pc_buffer <= pc_in + 1;
+            regfile_rs2_buffer <= regfile_rs2;
         end
     end
+
+    assign exe_rs1_address = inst_in[19:15];
+    assign exe_rs2_address = inst_in[24:20];
+    assign exe_uses_rs1 = !ctr_alu_asel || ctr_branch;
+    assign exe_uses_rs2 = !ctr_alu_bsel || ctr_branch;
+
+    //                                                                                                  //
 
     // * ALU connections
     logic [31:0] alu_imm;
@@ -108,26 +105,9 @@ module execute_stage(
         .a(alu_a), .b(alu_b), .fn3(alu_mod), .fn7_bit5(alu_fn7_bit5), .result(alu_result)
     );
 
-    // * Memory connections
-    assign address_out = alu_result[31:2];
-    assign bus_lock = ctr_bus_lock;
-    assign memory_mode = ctr_memory_mode;
-
-    output_adj output_adj( //Adjust the data
-        .data_in(regfile_rs2), .fn3(inst_fn3), .addr_low(alu_result[1:0]),
-        .data_out(data_out), .mask(mask)
-    );
-
-    /*
-    EXAMPLE: sh t0, 0(t1)
-    T0 = 0xFF50
-    T1 = 0x2
-    DATA_OUT = 0x50FF
-    MASK = 0011
-    */
+    //                                                                                                  //
 
     // * Branch handling
-    assign branch_feedback_enable = ctr_jump || ctr_branch;
 
     logic int_branch_result;
     wire branch_result = int_branch_result ^^ inst_fn3[0]; //For negative cases (BNE, BGE, BGEU)
@@ -141,37 +121,10 @@ module execute_stage(
         endcase
     end
 
-    assign branch_actual_result = branch_result;
-    assign pc_target_address = branch_actual_result ? alu_result[31:2] : pc_in;
-    assign branch_prediction_incorrect = (ctr_jump || ctr_branch) && (branch_actual_result ^^ branch_prediction_taken);
+    assign pc_jmp = ctr_jump || (ctr_branch && branch_result);
+    assign pc_target_address = alu_result[31:2];
+
+    //                                                                                                  //
 
 
 endmodule : execute_stage
-
-module output_adj(
-    input [31:0] data_in,
-    input [2:0] fn3,
-    input [1:0] addr_low,
-    output logic [31:0] data_out,
-    output logic [3:0] mask
-);
-    //Adjusts inputs from big to little endian
-
-    always_comb begin : OutputAdj_and_Mask
-        case(fn3)
-        3'h0: case(addr_low)
-            2'h0: begin data_out = {data_in[7:0], 24'h0}; mask = 4'b1000; end
-            2'h1: begin data_out = {8'h0, data_in[7:0], 16'h0}; mask = 4'b0100; end
-            2'h2: begin data_out = {16'h0, data_in[7:0], 8'h0}; mask = 4'b0010; end
-            2'h3: begin data_out = {24'h0, data_in[7:0]}; mask = 4'b0001; end
-            endcase
-        3'h1: case(addr_low)
-            2'h0, 2'h1: begin data_out = {data_in[7:0], data_in[15:8], 16'h0}; mask = 4'b1100; end
-            2'h2, 2'h3: begin data_out = {16'h0, data_in[7:0], data_in[15:8]}; mask = 4'b0011; end
-            endcase
-        3'h2: begin data_out = {data_in[7:0], data_in[15:8], data_in[23:16], data_in[31:24]}; mask = 4'b1111; end
-        default: begin data_out = 0; mask = 0; end
-        endcase
-    end
-
-endmodule : output_adj

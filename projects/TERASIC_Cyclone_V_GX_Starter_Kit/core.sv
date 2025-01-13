@@ -1,5 +1,3 @@
-//todo: fix all the new fucking bugs I got after removing branch prediction
-
 module core(
     input clk, clk_en, sync_rst,
     

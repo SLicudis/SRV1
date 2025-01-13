@@ -28,7 +28,7 @@ module writeback_stage(
         2'h0: data_out = alu_in;
         2'h1: data_out = adjusted_memory_data;
         2'h2: data_out = {inc_pc_in, 2'b0};
-        2'h3: data_out = {{12{u_type_imm_in[19]}}, u_type_imm_in};
+        2'h3: data_out = {u_type_imm_in, 12'h0};
         endcase
     end
 
