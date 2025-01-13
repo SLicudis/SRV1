@@ -8,6 +8,7 @@ Pinout:
 
 - INST_ADDRESS: Instruction address
 - INST_IN: Instruction from the instruction memory
+- INST_REQ: Request output from instruction memory
 
 - DATA_IN: Data from the data memory
 - DATA_OUT: Data to the data memory
