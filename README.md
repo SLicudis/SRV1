@@ -1,5 +1,5 @@
 # SRV1
-The "Slicudis RISC-V 1" is an RV32I core written by Slicudis on System Verilog. It features a 4-stage pipeline (Fetch, decode, execute and writeback) with BTB branch prediction (64 entries).
+The "Slicudis RISC-V 1" is an RV32I core written by Slicudis on System Verilog. It features a 5-stage pipeline (Fetch, decode, execute, memory and writeback).
 
 Pinout:
 - CLK: Clock input
@@ -18,15 +18,13 @@ Pinout:
 - MEMORY_MODE: Read from memory if low, write to memory if high
 
 
-Test program: (Fibonacci sequence)
+Test program: (Counter)
 ```
 setup:
-li x1, 1
-li x2, 0
-
+li x1, 0
+li x2, 0x4000
 loop:
-add x3, x1, x2
-mv x2, x1
-mv x1, x3
+addi x1, x1, 1
+sw x1, 0(x2)
 j loop
 ```
