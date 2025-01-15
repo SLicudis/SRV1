@@ -22,7 +22,7 @@ module decode_stage(
 );
     //                                                                                                  //
     
-    // * Execute stage buffers
+    // * --- Execute stage buffers ---
 
     reg [31:0] inst_out_buffer;
     reg [12:0] ctr_word_out_buffer;
@@ -44,9 +44,9 @@ module decode_stage(
 
     //                                                                                                  //
 
-    // * Instruction decoding
+    // * --- Instruction decoder ---
 
-    wire [12:0] decoder_ctr_word;
+    wire [12:0] decoder_ctr_word; //Illegal instructions are NOPs
 
     inst_dec_rom instruction_decoder (
         .opcode(inst_in[6:0]), .ctr_word(decoder_ctr_word)
@@ -54,8 +54,9 @@ module decode_stage(
 
     //                                                                                                  //
 
-    // * Register file
+    // * --- Register file ----
 
+    //Has automatic forwarding and is compatible with the M9K block RAM
     regfile regfile(
         .clk(clk), .clk_en(clk_en), .we(regfile_we),
         .data_in(regfile_data_in), .rs1_addr(inst_in[19:15]), .rs2_addr(inst_in[24:20]), .rd_addr(regfile_destination),

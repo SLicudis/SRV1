@@ -96,6 +96,7 @@ module core(
     wire [4:0] exe_regfile_rs2_address;
     wire exe_uses_rs1;
     wire exe_uses_rs2;
+    wire exe_branch_result;
 
     execute_stage execute_stage(
         .clk(clk),
@@ -109,9 +110,8 @@ module core(
         .regfile_rs2(regfile_rs2),
         .pc_in(dec_pc_out),
 
-        // * To decode stage
-        .pc_target_address(pc_target_address),
-        .pc_jmp(pc_jmp),
+        // * From memory stage
+        .invalidate(pc_jmp),
 
         // * To memory stage
         .ctr_out(exe_ctr_word_out),
@@ -122,7 +122,8 @@ module core(
         .exe_rs1_address(exe_regfile_rs1_address),
         .exe_rs2_address(exe_regfile_rs2_address),
         .exe_uses_rs1(exe_uses_rs1),
-        .exe_uses_rs2(exe_uses_rs2)
+        .exe_uses_rs2(exe_uses_rs2),
+        .branch_result_out(exe_branch_result)
     );
 
     //                                                                                                  //
@@ -155,9 +156,14 @@ module core(
         .exe_regfile_rs2_address(exe_regfile_rs2_address),
         .exe_uses_rs1(exe_uses_rs1),
         .exe_uses_rs2(exe_uses_rs2),
+        .branch_result_in(exe_branch_result),
 
         // * To previous stages
         .stall(pipeline_stall),
+
+        // * To decode stage
+        .pc_target_address(pc_target_address),
+        .pc_jmp(pc_jmp),
 
         // * To data memory
         .data_out(data_out),

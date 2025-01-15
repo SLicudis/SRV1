@@ -11,9 +11,14 @@ module memory_stage(
     input [4:0] exe_regfile_rs2_address, //Current RS2 in the execute stage (Not buffered data)
     input exe_uses_rs1,
     input exe_uses_rs2,
+    input branch_result_in,
 
     // * To previous stages
     output stall,
+
+    // * To fetch stage
+    output pc_jmp,
+    output [29:0] pc_target_address,
 
     // * To data memory
     output [31:0] data_out,
@@ -100,6 +105,13 @@ module memory_stage(
     DATA_OUT = 0x50FF
     MASK = 0011
     */
+
+    //                                                                                                  //
+
+    // * --- Branching/jumping ---
+
+    assign pc_jmp = branch_result_in;
+    assign pc_target_address = alu_in[31:2];
 
     //                                                                                                  //
 
