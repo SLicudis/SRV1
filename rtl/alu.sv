@@ -10,7 +10,7 @@ module alu(
     // * Output
     output logic [31:0] result
 );
-    //                                                                                                  //
+    ///
 
     // * --- Adder-subtractor ---
 
@@ -21,7 +21,7 @@ module alu(
 
     wire overflow = ~(a[31] ^ b[31]) & (int_add_sub[31] ^ a[31]);
 
-    //                                                                                                  //
+    ///
 
     // * --- Barrel shifter ---
 
@@ -41,7 +41,7 @@ module alu(
     wire [31:0] barrel_shifter_a = fn3[2] ? a : reversed_a;
     wire [63:0] barrel_shifter_result = {{32{fn7_bit5}}, barrel_shifter_a} >> b;
 
-    //                                                                                                  //
+    ///
 
     // * --- Body of the ALU ---
 
@@ -57,9 +57,10 @@ module alu(
             SHIFT_RIGHT: result = barrel_shifter_result[31:0];
             OR: result = a | b;
             AND: result = a & b;
+            default: result = 0;
         endcase
     end
 
-    //                                                                                                  //
+    ///
 
 endmodule : alu

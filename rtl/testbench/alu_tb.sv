@@ -66,7 +66,7 @@ module alu_tb(
             alu_b <= 32'hff0f00f0;
             alu_fn3 <= 8;
         end
-        default:;
+        default: /*nothing*/;
         endcase
     end
 

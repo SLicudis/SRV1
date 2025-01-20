@@ -14,7 +14,7 @@ module toplevel #(
 
     reg rst_ff0;
     reg rst_ff1;
-    reg boot_rst = 0; //This Flip Flop will reset the whole system on boot
+    reg boot_rst; //This Flip Flop will reset the whole system on boot
 
     always_ff @(posedge clk) begin
         rst_ff0 <= async_rst;

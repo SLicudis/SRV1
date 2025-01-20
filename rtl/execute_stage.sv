@@ -20,7 +20,8 @@ module execute_stage(
     output exe_uses_rs2, //Currently using RS1? (Used for detecting hazards from the memory stage)
     output branch_result_out //Buffered branch result (1 = taken)
 );
-    //                                                                                                  //
+
+    ///
 
     // * Control lines
     wire ctr_alu_asel = ctr_word_in[0]; //Select input A of the ALU
@@ -40,7 +41,7 @@ module execute_stage(
     wire [31:0] inst_u_imm = {inst_in[31:12], 12'h0};
     wire [31:0] inst_j_imm = {{12{inst_in[31]}}, inst_in[20], inst_in[19:12], inst_in[30:21], 1'b0};
 
-    //                                                                                                  //
+    ///
 
     // * --- Memory stage buffers & outputs ---
 
@@ -81,7 +82,8 @@ module execute_stage(
     assign exe_uses_rs1 = !ctr_alu_asel || ctr_branch; //RS1 can be used in the ALU or in the branch comparator
     assign exe_uses_rs2 = !ctr_alu_bsel || ctr_branch; //RS2 can be used in the ALU or in the branch comparator
 
-    //                                                                                                  //
+
+    ///
 
     // * ALU connections
     logic [31:0] alu_imm;
@@ -102,13 +104,13 @@ module execute_stage(
     wire [2:0] alu_mod = ctr_alu_modsel ? 3'h0 : inst_fn3; //Operation of the ALU
 
     wire [31:0] alu_result;
-    wire alu_fn7_bit5 = inst_fn7[5] && !ctr_alu_modsel //Disable subtraction if alu_modsel is 1
+    wire alu_fn7_bit5 = inst_fn7[5] && !ctr_alu_modsel; //Disable subtraction if alu_modsel is 1
 
     alu alu(
         .a(alu_a), .b(alu_b), .fn3(alu_mod), .fn7_bit5(alu_fn7_bit5), .result(alu_result)
     );
 
-    //                                                                                                  //
+    ///
 
     // * Branch handling
 
@@ -124,7 +126,6 @@ module execute_stage(
         endcase
     end
 
-    //                                                                                                  //
-
+    ///
 
 endmodule : execute_stage

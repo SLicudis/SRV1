@@ -1,8 +1,8 @@
-#include "obj_dir/Vcore_tb.h"
+#include "obj_dir/Vcyclonev_top_tb.h"
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-#define MAX_SIM_TIME 2000000
+#define MAX_SIM_TIME 5000
 vluint64_t sim_time = 0;
 
 main(int argc, char** argv, char** env) {

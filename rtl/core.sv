@@ -1,5 +1,3 @@
-//todo: fix all the new fucking bugs I got after removing branch prediction
-
 module core(
     input clk, clk_en, sync_rst,
     
@@ -24,12 +22,60 @@ module core(
     // ! The core isn't made to support instruction cache/memory coherency
     // ! Verilator's "Signal unoptimizable: Circular combinational logic: 'inst_address'" error is a false alarm
 
-    //                                                                                                  //
+    // * --- Wires ---
 
-    // * --- Fetch ---
+    // * Fetch
 
     wire [29:0] pc_to_decode;
     assign inst_req = clk_en && !pipeline_stall;
+
+    // * Decode
+
+    wire [31:0] adjusted_inst_in = {inst_in[7:0], inst_in[15:8], inst_in[23:16], inst_in[31:24]};
+
+    wire [31:0] dec_inst_out;
+    wire [12:0] dec_ctr_word_out;
+    wire [31:0] regfile_rs1;
+    wire [31:0] regfile_rs2;
+    wire [29:0] dec_pc_out;
+
+    // * Execute
+
+    wire [29:0] pc_target_address;
+    wire pc_jmp;
+
+    wire [31:0] exe_inst_out;
+    wire [4:0] exe_ctr_word_out;
+    wire [31:0] exe_alu_out;
+    wire [29:0] exe_inc_pc_out;
+    wire [31:0] exe_regfile_rs2_out;
+    wire [4:0] exe_regfile_rs1_address;
+    wire [4:0] exe_regfile_rs2_address;
+    wire exe_uses_rs1;
+    wire exe_uses_rs2;
+    wire exe_branch_result;
+
+    // * Memory
+
+    wire pipeline_stall;
+
+    wire [19:0] mem_inst_u_imm_out;
+    wire [2:0] mem_inst_fn3_out;
+    wire [4:0] mem_rd_addr_out;
+    wire [2:0] mem_ctr_out;
+    wire [31:0] mem_alu_out;
+    wire [29:0] mem_inc_pc_out;
+
+    // * Writeback
+    
+    wire [31:0] regfile_data_in;
+    wire [4:0] regfile_destination;
+    wire regfile_we;
+
+
+    //                                                                                                  //
+
+    // * --- Fetch ---
 
     fetch_stage fetch_stage(
         .clk(clk),
@@ -43,15 +89,6 @@ module core(
 
     //                                                                                                  //
     // * --- Decode ---
-
-    wire [31:0] adjusted_inst_in = {inst_in[7:0], inst_in[15:8], inst_in[23:16], inst_in[31:24]};
-
-    // * To execute stage
-    wire [31:0] dec_inst_out;
-    wire [12:0] dec_ctr_word_out;
-    wire [31:0] regfile_rs1;
-    wire [31:0] regfile_rs2;
-    wire [29:0] dec_pc_out;
 
     decode_stage decode_stage(
         .clk(clk),
@@ -81,22 +118,6 @@ module core(
     //                                                                                                  //
 
     // * --- Execute ---
-
-    // * To fetch stage
-    wire [29:0] pc_target_address;
-    wire pc_jmp;
-
-    // * To memory stage
-    wire [31:0] exe_inst_out;
-    wire [4:0] exe_ctr_word_out;
-    wire [31:0] exe_alu_out;
-    wire [29:0] exe_inc_pc_out;
-    wire [31:0] exe_regfile_rs2_out;
-    wire [4:0] exe_regfile_rs1_address;
-    wire [4:0] exe_regfile_rs2_address;
-    wire exe_uses_rs1;
-    wire exe_uses_rs2;
-    wire exe_branch_result;
 
     execute_stage execute_stage(
         .clk(clk),
@@ -129,17 +150,6 @@ module core(
     //                                                                                                  //
 
     // * --- Memory ---
-
-    // * To previous stages
-    wire pipeline_stall;
-
-    // * To writeback stage
-    wire [19:0] mem_inst_u_imm_out;
-    wire [2:0] mem_inst_fn3_out;
-    wire [4:0] mem_rd_addr_out;
-    wire [2:0] mem_ctr_out;
-    wire [31:0] mem_alu_out;
-    wire [29:0] mem_inc_pc_out;
 
     memory_stage memory_stage(
         .clk(clk),
@@ -184,11 +194,6 @@ module core(
     //                                                                                                  //
 
     // * --- Writeback ---
-
-    // * To decode stage
-    wire [31:0] regfile_data_in;
-    wire [4:0] regfile_destination;
-    wire regfile_we;
 
     writeback_stage writeback_stage(
         .ctr_word_in(mem_ctr_out),
