@@ -20,6 +20,10 @@ Pinout:
 # How to generate an RV32E core instead of an RV32I core?
 Set the "RV32E" parameter from "core.sv" to 1 if you want to generate an RV32E core.
 
+# How does ECALL work?
+SRV1 cores don't have CSRs. The ECALL instruction behaves like a jump instruction and will set the PC to a constant adress value (Specified by the ECALL_ADDRESS parameter from core.sv). EBREAK will behave like ECALL and jump to ECALL_ADDRESS.\
+The return address won't be saved automatically and the caller will have to manually save it by pushing the PC onto the stack. The ECALL subroutine program will have to pop the address from the stack and jump back to the caller's code.
+
 
 # Test program: (Counter)
 ```
