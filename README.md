@@ -17,7 +17,7 @@ Pinout:
 - BUS_LOCK: Lock the data bus to access data memory / periferals
 - MEMORY_MODE: Read from memory if low, write to memory if high
 
-# How to generate an RV32E core instead of an RV32I core?:\
+# How to generate an RV32E core instead of an RV32I core?
 Set the "RV32E" parameter from "core.sv" to 1 if you want to generate an RV32E core.
 
 
