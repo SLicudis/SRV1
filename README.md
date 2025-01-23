@@ -1,5 +1,5 @@
 # SRV1
-The "Slicudis RISC-V 1" is an RV32I core written by Slicudis on System Verilog. It features a 5-stage pipeline (Fetch, decode, execute, memory and writeback).
+The "Slicudis RISC-V 1" is an RV32I/E core written by Slicudis on System Verilog. It features a 5-stage pipeline (Fetch, decode, execute, memory and writeback).
 
 Pinout:
 - CLK: Clock input
@@ -17,8 +17,11 @@ Pinout:
 - BUS_LOCK: Lock the data bus to access data memory / periferals
 - MEMORY_MODE: Read from memory if low, write to memory if high
 
+# How to generate an RV32E core instead of an RV32I core?:\
+Set the "RV32E" parameter from "core.sv" to 1 if you want to generate an RV32E core.
 
-Test program: (Counter)
+
+# Test program: (Counter)
 ```
 setup:
 li x1, 0
