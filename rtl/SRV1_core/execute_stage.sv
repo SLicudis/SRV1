@@ -3,7 +3,7 @@ module execute_stage(
     
     // * From decode stage
     input [31:0] inst_in,
-    input [12:0] ctr_word_in,
+    input [13:0] ctr_word_in,
     input [31:0] regfile_rs1,
     input [31:0] regfile_rs2,
     input [29:0] pc_in,
