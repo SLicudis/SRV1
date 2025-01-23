@@ -1,9 +1,11 @@
-module memory_stage(
+module memory_stage #(
+    parameter [29:0] ECALL_ADDRESS = 0
+)(
     input clk, clk_en, sync_rst,
 
     // * From execute stage
     input [31:0] inst_in,
-    input [4:0] ctr_word_in,
+    input [5:0] ctr_word_in,
     input [31:0] alu_in,
     input [29:0] inc_pc_in,
     input [31:0] regfile_rs2,
@@ -69,7 +71,7 @@ module memory_stage(
             inst_u_imm_buffer <= inst_in[31:12];
             inst_fn3_buffer <= inst_in[14:12];
             rd_addr_buffer <= inst_rd_addr;
-            ctr_buffer <= ctr_word_in[4:2];
+            ctr_buffer <= ctr_word_in[5:3];
             alu_buffer <= alu_in;
             inc_pc_buffer <= inc_pc_in;
         end
@@ -87,8 +89,8 @@ module memory_stage(
 
     // * --- Memory access ---
 
-    assign bus_lock = ctr_word_in[0];
-    assign memory_mode = ctr_word_in[1];
+    assign bus_lock = ctr_word_in[1];
+    assign memory_mode = ctr_word_in[2];
     assign address_out = alu_in[31:2];
 
     output_adj output_adj(
@@ -108,7 +110,7 @@ module memory_stage(
     // * --- Branching/jumping ---
 
     assign pc_jmp = branch_result_in;
-    assign pc_target_address = alu_in[31:2];
+    assign pc_target_address = ctr_word_in ? ECALL_ADDRESS : alu_in[31:2];
 
     ///
 

@@ -9,7 +9,7 @@ module execute_stage(
     input [29:0] pc_in,
 
     // * To memory stage
-    output [4:0] ctr_out, //Buffered control signals
+    output [5:0] ctr_out, //Buffered control signals
     output [31:0] inst_out, //Buffered instruction
     output [31:0] alu_out, //Buffered output of the ALU
     output [29:0] inc_pc_out, //Incremented PC used by JAL and JALR
@@ -22,7 +22,6 @@ module execute_stage(
 );
 
     ///
-
     // * Control lines
     wire ctr_alu_asel = ctr_word_in[0]; //Select input A of the ALU
     wire ctr_alu_bsel = ctr_word_in[1]; //Select input B of the ALU
@@ -42,10 +41,9 @@ module execute_stage(
     wire [31:0] inst_j_imm = {{12{inst_in[31]}}, inst_in[20], inst_in[19:12], inst_in[30:21], 1'b0};
 
     ///
-
     // * --- Memory stage buffers & outputs ---
 
-    reg [4:0] ctr_buffer;
+    reg [5:0] ctr_buffer;
     assign ctr_out = ctr_buffer;
 
     reg [31:0] inst_buffer;
@@ -68,7 +66,7 @@ module execute_stage(
             ctr_buffer <= 0;
             branch_result_buffer <= 0;
         end else if(clk_en) begin
-            ctr_buffer <= ctr_word_in[12:8];
+            ctr_buffer <= ctr_word_in[13:8];
             inst_buffer <= inst_in;
             alu_buffer <= alu_result;
             inc_pc_buffer <= pc_in + 1;
@@ -84,7 +82,6 @@ module execute_stage(
 
 
     ///
-
     // * ALU connections
     logic [31:0] alu_imm;
 
@@ -111,7 +108,6 @@ module execute_stage(
     );
 
     ///
-
     // * Branch handling
 
     logic int_branch_result;

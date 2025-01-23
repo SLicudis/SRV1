@@ -1,5 +1,3 @@
-// ! Test toplevel
-
 module toplevel #(
     parameter string PROGRAM_LOCATION = "programs/<file>.<format>" //Must be in hex format
 )(

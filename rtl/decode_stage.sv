@@ -17,7 +17,7 @@ module decode_stage #(
 
     // * To the execute stage
     output [31:0] inst_out,
-    output [12:0] ctr_word_out,
+    output [13:0] ctr_word_out,
     output [31:0] regfile_rs1_out,
     output [31:0] regfile_rs2_out,
     output [29:0] pc_out
@@ -27,7 +27,7 @@ module decode_stage #(
     // * --- Execute stage buffers ---
 
     reg [31:0] inst_out_buffer;
-    reg [12:0] ctr_word_out_buffer;
+    reg [13:0] ctr_word_out_buffer;
     reg [29:0] pc_buffer;
     assign pc_out = pc_buffer;
 
@@ -47,7 +47,7 @@ module decode_stage #(
     ///
     // * --- Instruction decoder ---
 
-    wire [12:0] decoder_ctr_word; //Illegal instructions are NOPs
+    wire [13:0] decoder_ctr_word; //Illegal instructions are NOPs
 
     inst_dec_rom instruction_decoder (
         .opcode(inst_in[6:0]), .ctr_word(decoder_ctr_word)

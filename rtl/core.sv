@@ -1,5 +1,6 @@
 module core #(
-    parameter RV32E = 0 //0 = RV32I, 1 = RV32E
+    parameter RV32E = 1, //0 = RV32I, 1 = RV32I
+    parameter [31:0] ECALL_ADDRESS = 'hffff0000 //Jump address when executing the ECALL instruction
 )(
     input clk, clk_en, sync_rst,
     
@@ -120,7 +121,6 @@ module core #(
     );
 
     ///
-
     // * --- Execute ---
 
     execute_stage execute_stage(
@@ -152,10 +152,11 @@ module core #(
     );
 
     ///
-
     // * --- Memory ---
 
-    memory_stage memory_stage(
+    memory_stage #(
+        .ECALL_ADDRESS(ECALL_ADDRESS)
+    ) memory_stage(
         .clk(clk),
         .clk_en(clk_en),
         .sync_rst(sync_rst),
