@@ -1,5 +1,5 @@
 module core #(
-    parameter RV32E = 1 //0 = RV32I, 1 = RV32E
+    parameter RV32E = 0 //0 = RV32I, 1 = RV32E
 )(
     input clk, clk_en, sync_rst,
     
