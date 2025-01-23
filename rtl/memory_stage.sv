@@ -76,7 +76,6 @@ module memory_stage(
     end
 
     ///
-
     // * --- Hazard detection & Pipeline stalls ---
 
     wire rs1_hazard = (inst_rd_addr == exe_regfile_rs1_address) && exe_uses_rs1; //Check for dependencies with RS1
@@ -106,7 +105,6 @@ module memory_stage(
     */
 
     ///
-
     // * --- Branching/jumping ---
 
     assign pc_jmp = branch_result_in;

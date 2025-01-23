@@ -19,3 +19,4 @@ module fetch_stage(
     // ! Assumes that the instruction memory is synchronous
 
 endmodule : fetch_stage
+

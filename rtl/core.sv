@@ -1,4 +1,6 @@
-module core(
+module core #(
+    parameter RV32E = 1 //0 = RV32I, 1 = RV32E
+)(
     input clk, clk_en, sync_rst,
     
     // * From instruction memory
@@ -73,7 +75,7 @@ module core(
     wire regfile_we;
 
 
-    //                                                                                                  //
+    ///
 
     // * --- Fetch ---
 
@@ -87,10 +89,12 @@ module core(
         .to_address(inst_address)
     );
 
-    //                                                                                                  //
+    ///
     // * --- Decode ---
 
-    decode_stage decode_stage(
+    decode_stage #(
+        .RV32E(RV32E)
+    ) decode_stage (
         .clk(clk),
         .clk_en(clk_en && !pipeline_stall),
         .sync_rst(sync_rst),
@@ -115,7 +119,7 @@ module core(
         .regfile_we(regfile_we)
     );
 
-    //                                                                                                  //
+    ///
 
     // * --- Execute ---
 
@@ -147,7 +151,7 @@ module core(
         .branch_result_out(exe_branch_result)
     );
 
-    //                                                                                                  //
+    ///
 
     // * --- Memory ---
 
@@ -191,7 +195,7 @@ module core(
         .inc_pc_out(mem_inc_pc_out)
     );
 
-    //                                                                                                  //
+    ///
 
     // * --- Writeback ---
 

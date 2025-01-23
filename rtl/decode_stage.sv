@@ -1,4 +1,6 @@
-module decode_stage(
+module decode_stage #(
+    parameter RV32E = 0 //0 = RV32I, 1 = RV32E
+)(
     input clk, clk_en, sync_rst,
     input [31:0] inst_in,
 
@@ -21,8 +23,7 @@ module decode_stage(
     output [29:0] pc_out
 );
 
-///
-    
+    ///
     // * --- Execute stage buffers ---
 
     reg [31:0] inst_out_buffer;
@@ -43,8 +44,7 @@ module decode_stage(
     assign inst_out = inst_out_buffer;
     assign ctr_word_out = ctr_word_out_buffer;
 
-///
-
+    ///
     // * --- Instruction decoder ---
 
     wire [12:0] decoder_ctr_word; //Illegal instructions are NOPs
@@ -53,17 +53,17 @@ module decode_stage(
         .opcode(inst_in[6:0]), .ctr_word(decoder_ctr_word)
     );
 
-///
-
+    ///
     // * --- Register file ----
 
     //Has automatic forwarding and is compatible with the M9K block RAM
-    regfile regfile(
+    regfile #(
+        .RV32E(RV32E)
+    ) regfile(
         .clk(clk), .clk_en(clk_en), .we(regfile_we),
         .data_in(regfile_data_in), .rs1_addr(inst_in[19:15]), .rs2_addr(inst_in[24:20]), .rd_addr(regfile_destination),
         .rs1(regfile_rs1_out), .rs2(regfile_rs2_out)
     );
 
-///
-
+    ///
 endmodule : decode_stage
