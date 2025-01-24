@@ -6,7 +6,7 @@ module cyclonev_top_tb(
     wire [17:0] leds;
 
     toplevel #(
-        .PROGRAM_LOCATION("/mnt/e/Programacion/SystemVerilog/RISC-V/SRV1/projects/TERASIC_Cyclone_V_GX_Starter_Kit/programs/led_counter/program.hex")
+        .PROGRAM_LOCATION("/mnt/e/programacion/systemverilog/risc-v/srv1/rtl/testbench/rom.hex")
     ) toplevel(
         .clk(clk),
         .switches(switches),

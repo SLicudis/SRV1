@@ -37,7 +37,7 @@ module core #(
     wire [31:0] adjusted_inst_in = {inst_in[7:0], inst_in[15:8], inst_in[23:16], inst_in[31:24]};
 
     wire [31:0] dec_inst_out;
-    wire [12:0] dec_ctr_word_out;
+    wire [13:0] dec_ctr_word_out;
     wire [31:0] regfile_rs1;
     wire [31:0] regfile_rs2;
     wire [29:0] dec_pc_out;
@@ -48,7 +48,7 @@ module core #(
     wire pc_jmp;
 
     wire [31:0] exe_inst_out;
-    wire [4:0] exe_ctr_word_out;
+    wire [5:0] exe_ctr_word_out;
     wire [31:0] exe_alu_out;
     wire [29:0] exe_inc_pc_out;
     wire [31:0] exe_regfile_rs2_out;
@@ -125,7 +125,7 @@ module core #(
 
     execute_stage execute_stage (
         .clk(clk),
-        .clk_en(clk_en && !pipeline_stall),
+        .clk_en(clk_en),
         .sync_rst(sync_rst),
 
         // * From decode stage
@@ -137,6 +137,7 @@ module core #(
 
         // * From memory stage
         .invalidate(pc_jmp),
+        .stall(pipeline_stall),
 
         // * To memory stage
         .ctr_out(exe_ctr_word_out),

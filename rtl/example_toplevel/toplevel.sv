@@ -65,7 +65,7 @@ module toplevel #(
 
     always_ff @(posedge clk) begin : MemoryFFblock
         if(clk_en) begin
-            if(data_bus_lock && !(|data_address[29:12])) begin
+            if(data_bus_lock && (data_address < 'h1000)) begin
                 if(data_bus_mode) begin
                     if(core_data_mask[0]) data_ram0[data_address[11:0]] <= core_data_out[7:0];
                     if(core_data_mask[1]) data_ram1[data_address[11:0]] <= core_data_out[15:8];
@@ -103,7 +103,7 @@ module toplevel #(
     wire [29:0] inst_address;
     wire inst_req;
 
-    reg [31:0] inst_rom [255:0];
+    reg [31:0] inst_rom [4095:0];
     reg [31:0] inst_rom_buffer;
 
     initial begin
@@ -112,7 +112,7 @@ module toplevel #(
 
     always_ff @(posedge clk) begin
         if(clk_en) begin
-            if(inst_req) inst_rom_buffer <= inst_rom[inst_address[7:0]];
+            if(inst_req) inst_rom_buffer <= inst_rom[inst_address[11:0]];
         end
     end
 

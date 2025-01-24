@@ -1,5 +1,5 @@
 module execute_stage(
-    input clk, clk_en, sync_rst, invalidate,
+    input clk, clk_en, sync_rst,
     
     // * From decode stage
     input [31:0] inst_in,
@@ -7,6 +7,10 @@ module execute_stage(
     input [31:0] regfile_rs1,
     input [31:0] regfile_rs2,
     input [29:0] pc_in,
+
+    // * From memory stage
+    input invalidate,
+    input stall,
 
     // * To memory stage
     output [5:0] ctr_out, //Buffered control signals
@@ -62,7 +66,7 @@ module execute_stage(
     assign branch_result_out = branch_result_buffer;
 
     always_ff @(posedge clk) begin : Buffer
-        if(sync_rst || invalidate) begin
+        if(sync_rst || invalidate || (stall && clk_en)) begin
             ctr_buffer <= 0;
             branch_result_buffer <= 0;
         end else if(clk_en) begin
@@ -78,8 +82,7 @@ module execute_stage(
     assign exe_rs1_address = inst_in[19:15];
     assign exe_rs2_address = inst_in[24:20];
     assign exe_uses_rs1 = !ctr_alu_asel || ctr_branch; //RS1 can be used in the ALU or in the branch comparator
-    assign exe_uses_rs2 = !ctr_alu_bsel || ctr_branch; //RS2 can be used in the ALU or in the branch comparator
-
+    assign exe_uses_rs2 = !ctr_alu_bsel || ctr_branch || (ctr_word_in[9] && ctr_word_in[10]); //RS2 can be used in the ALU, in the branch comparator or store operations
 
     ///
     // * ALU connections

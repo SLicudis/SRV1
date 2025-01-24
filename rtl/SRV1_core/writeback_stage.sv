@@ -18,7 +18,7 @@ module writeback_stage(
     
     wire [31:0] adjusted_memory_data;
 
-    input_adj input_adj(
+    input_adj input_adj (
         .data_in(memory_data_in), .fn3(fn3_in), .addr_low(alu_in[1:0]),
         .data_out(adjusted_memory_data)
     );

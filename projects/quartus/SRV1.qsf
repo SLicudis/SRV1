@@ -39,7 +39,7 @@
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE22F17C6
-set_global_assignment -name TOP_LEVEL_ENTITY toplevel
+set_global_assignment -name TOP_LEVEL_ENTITY core
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 23.1STD.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "01:28:07  JANUARY 08, 2025"
 set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.0 Lite Edition"
@@ -51,15 +51,17 @@ set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/writeback_stage.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/toplevel.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/regfile.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/memory_stage.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/fetch_stage.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/execute_stage.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/decode_stage.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/core.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/alu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/writeback_stage.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/regfile.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/output_adj.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/memory_stage.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/inst_dec_rom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/input_adj.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/fetch_stage.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/execute_stage.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/decode_stage.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/core.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../rtl/SRV1_core/alu.sv
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top

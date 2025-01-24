@@ -89,7 +89,7 @@ module memory_stage #(
     wire rs1_hazard = (inst_rd_addr == exe_regfile_rs1_address) && exe_uses_rs1; //Check for dependencies with RS1
     wire rs2_hazard = (inst_rd_addr == exe_regfile_rs2_address) && exe_uses_rs2; //Check for dependencies with RS2
 
-    assign stall = ctr_word_in[2] && (rs1_hazard || rs2_hazard) && (|inst_rd_addr);
+    assign stall = ctr_word_in[3] && (rs1_hazard || rs2_hazard) && (|inst_rd_addr);
     
     ///
 
